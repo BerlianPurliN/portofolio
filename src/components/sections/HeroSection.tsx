@@ -10,16 +10,16 @@ export default function HeroSection() {
       {/* Ubah warna / posisi glow di sini untuk mengganti mood halaman.    */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-32 -left-32 h-[420px] w-[420px] rounded-full bg-indigo-500/20 blur-3xl"
+        className="pointer-events-none absolute -top-32 -left-32 h-105 w-105 rounded-full bg-indigo-500/20 blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-40 right-0 h-[300px] w-[300px] rounded-full bg-fuchsia-500/10 blur-3xl"
+        className="pointer-events-none absolute bottom-40 right-0 h-75 w-75 rounded-full bg-fuchsia-500/10 blur-3xl"
       />
       {/* Grid pattern halus — opsional, hapus jika terlalu ramai. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_75%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-size-[48px_48px] mask-[radial-gradient(ellipse_at_center,black_40%,transparent_75%)]"
       />
 
       {/* ----- Konten utama ------------------------------------------------ */}
@@ -46,7 +46,7 @@ export default function HeroSection() {
 
           {/* Role — pakai gradient text supaya menonjol. */}
           <p className="text-2xl font-medium sm:text-3xl lg:text-4xl">
-            <span className="bg-gradient-to-r from-indigo-300 via-sky-300 to-fuchsia-300 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-300 via-sky-300 to-fuchsia-300 bg-clip-text text-transparent">
               {profile.role}
             </span>
           </p>

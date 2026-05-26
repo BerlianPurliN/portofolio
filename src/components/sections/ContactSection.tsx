@@ -181,11 +181,11 @@ export default function ContactSection() {
       {/* ----- Background dekoratif (glow lembut) ---------------------------- */}
       <div
         aria-hidden
-        className="pointer-events-none absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/10 blur-3xl"
+        className="pointer-events-none absolute top-1/2 left-1/2 h-105 w-105 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/10 blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-fuchsia-500/10 blur-3xl"
+        className="pointer-events-none absolute bottom-0 right-0 h-75 w-75 rounded-full bg-fuchsia-500/10 blur-3xl"
       />
 
       <div className="relative mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-16">
@@ -196,7 +196,7 @@ export default function ContactSection() {
           </p>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
             Let&apos;s build something{" "}
-            <span className="bg-gradient-to-r from-indigo-300 via-sky-300 to-fuchsia-300 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-300 via-sky-300 to-fuchsia-300 bg-clip-text text-transparent">
               amazing
             </span>{" "}
             together
