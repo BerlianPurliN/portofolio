@@ -111,11 +111,17 @@ export default function ContactSection() {
     // ---------- Kirim email via EmailJS ----------
     setStatus("submitting");
     try {
-      await emailjs.send(
+      // Log untuk debugging
+      console.log("EmailJS config check:");
+      console.log("- Service ID:", EMAILJS_SERVICE_ID ? "✓ Set" : "✗ MISSING");
+      console.log("- Template ID:", EMAILJS_TEMPLATE_ID ? "✓ Set" : "✗ MISSING");
+      console.log("- Public Key:", EMAILJS_PUBLIC_KEY ? "✓ Set" : "✗ MISSING");
+
+      const result = await emailjs.send(
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
         {
-          // Variable ini harus sama dengan placeholder di EmailJS template
+          // Variable ini harus SAMA dengan placeholder di EmailJS template (case-sensitive)
           from_name: form.name.trim(),
           from_email: form.email.trim(),
           message: form.message.trim(),
@@ -124,14 +130,38 @@ export default function ContactSection() {
         { publicKey: EMAILJS_PUBLIC_KEY },
       );
 
+      console.log("✓ Email sent successfully:", result);
       recordSubmission(); // Catat untuk rate limit
       setStatus("success");
       setForm({ name: "", email: "", message: "", website: "" });
       setTimeout(() => setStatus("idle"), 4000);
     } catch (err) {
-      console.error("EmailJS error:", err);
+      // Log error detail untuk debugging
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" && err !== null
+            ? JSON.stringify(err)
+            : String(err);
+      console.error("❌ EmailJS error detail:", errorMsg);
+      console.error("Full error object:", err);
+
+      // Tampilkan user-friendly error message
       setStatus("error");
-      setErrorMsg("Gagal mengirim. Coba lagi atau email langsung.");
+      if (
+        errorMsg.includes("Allowed Domains") ||
+        errorMsg.includes("origin")
+      ) {
+        setErrorMsg(
+          "Domain tidak authorized. Set 'Allowed Domains' di EmailJS dashboard.",
+        );
+      } else if (errorMsg.includes("MISSING")) {
+        setErrorMsg("Config tidak lengkap. Cek .env.local Anda.");
+      } else if (errorMsg.includes("Template")) {
+        setErrorMsg("Template variable salah. Periksa di EmailJS.");
+      } else {
+        setErrorMsg(`Error: ${errorMsg.substring(0, 100)}`);
+      }
     }
   };
 
