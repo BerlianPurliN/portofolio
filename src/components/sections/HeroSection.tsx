@@ -14,7 +14,7 @@ export default function HeroSection() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-0 right-0 h-[360px] w-[360px] rounded-full bg-fuchsia-500/10 blur-3xl"
+        className="pointer-events-none absolute bottom-40 right-0 h-[300px] w-[300px] rounded-full bg-fuchsia-500/10 blur-3xl"
       />
       {/* Grid pattern halus — opsional, hapus jika terlalu ramai. */}
       <div
@@ -80,22 +80,6 @@ export default function HeroSection() {
               Get in touch
             </a>
           </div>
-
-          {/* ----- Social links -------------------------------------------- */}
-          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-500">
-            {profile.socials.map((s) => (
-              <li key={s.label}>
-                <a
-                  href={s.href}
-                  target={s.href.startsWith("http") ? "_blank" : undefined}
-                  rel="noopener noreferrer"
-                  className="transition hover:text-neutral-100"
-                >
-                  {s.label} ↗
-                </a>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>

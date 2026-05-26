@@ -1,8 +1,8 @@
 import HeroSection from "@/src/components/sections/HeroSection";
 import ProjectsSection from "@/src/components/sections/ProjectsSection";
+import ContactSection from "@/src/components/sections/ContactSection";
 import PillNav from "@/src/components/layout/PillNav";
 import { SmoothScrollProvider } from "@/src/components/SmoothScrollProvider";
-import { profile } from "@/src/data";
 
 export default function Home() {
   return (
@@ -12,10 +12,9 @@ export default function Home() {
         items={[
           { label: "Home", href: "#home" },
           { label: "Projects", href: "#projects" },
-          { label: "Experience", href: "#experience" },
-          { label: "Contact", href: `mailto:${profile.email}` },
+          { label: "Contact", href: "#contact" },
         ]}
-        onMobileMenuClick={''}
+        onMobileMenuClick={""}
         activeHref="#home"
         className="custom-nav"
         ease="power2.easeOut"
@@ -29,6 +28,7 @@ export default function Home() {
       {/* ----- Sections ------------------------------------------------- */}
       <HeroSection />
       <ProjectsSection />
+      <ContactSection />
     </SmoothScrollProvider>
   );
 }

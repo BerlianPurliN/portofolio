@@ -1,73 +1,73 @@
-// =============================================================================
-// src/components/SmoothScrollProvider.tsx
-// -----------------------------------------------------------------------------
-// Component wrapper yang mengaktifkan smooth scroll di seluruh halaman.
-// Gunakan di layout atau di page utama.
-// =============================================================================
-
 "use client";
 
 import { useEffect } from "react";
-import { gsap } from "gsap";
-import ScrollToPlugin from "gsap/ScrollToPlugin";
+import gsap from "gsap";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
-// Register GSAP plugin
+// Register GSAP plugin agar berfungsi
 gsap.registerPlugin(ScrollToPlugin);
+
+interface SmoothScrollProviderProps {
+  children: React.ReactNode;
+  /**
+   * Tinggi navbar (dalam pixel) untuk menghitung offset agar konten tidak tertimpa navbar.
+   * Default: 80 (sesuaikan dengan tinggi header/sticky navbar Anda)
+   */
+  navHeight?: number;
+}
 
 export function SmoothScrollProvider({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+  navHeight = 0, // Nilai default alto navbar Anda
+}: SmoothScrollProviderProps) {
   useEffect(() => {
-    // Tangkap semua anchor links (href dimulai dengan #)
-    const links = document.querySelectorAll('a[href^="#"]');
+    // 1. Pilih semua link yang href-nya dimulai dengan "#"
+    const links = document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
 
     const handleClick = (e: Event) => {
+      // 2. Cek apakah elemen target ada
       const link = e.currentTarget as HTMLAnchorElement;
       const href = link.getAttribute("href");
 
-      // Skip jika href hanya "#"
       if (!href || href === "#") return;
 
-      const targetId = href.substring(1); // Hapus # dari href
+      const targetId = href.substring(1); // Hapus karakter "#"
       const targetElement = document.getElementById(targetId);
 
-      // Jika target ditemukan, lakukan smooth scroll dengan GSAP
       if (targetElement) {
-        e.preventDefault();
+        e.preventDefault(); // Mencegah lompatan default browser
 
-        // Dapatkan posisi scroll target dengan offset untuk navbar
-        const navHeight = 1; // Sesuaikan dengan tinggi navbar sticky Anda
+        // 3. Hitung posisi scroll target dikurangi tinggi navbar
+        // getBoundingClientRect().top relatif terhadap viewport, perlu + window.scrollY (posisi absolut)
         const targetScrollY =
           targetElement.getBoundingClientRect().top +
           window.scrollY -
           navHeight;
 
-        // Animate scroll dengan GSAP
+        // 4. EKsekusi Animasi GSAP
         gsap.to(window, {
           scrollTo: {
             y: targetScrollY,
-            autoKill: false,
+            autoKill: false, // Pastikan animasi tidak berhenti tiba-tiba bila user scroll manual
           },
-          duration: 0.1,
-          ease: "power2.inOut",
+          duration: 1.2, // <<< PERUBAHAN: Lebih lama agar terlihat "smooth" dan berat
+          ease: "power3.out", // <<< PERUBAHAN: Lebih halus daripada power2.out
         });
       }
     };
 
-    // Tambahkan event listener ke semua anchor links
+    // Pasang event listener
     links.forEach((link) => {
       link.addEventListener("click", handleClick);
     });
 
-    // Cleanup
+    // Cleanup saat komponen unmount (penting di React)
     return () => {
       links.forEach((link) => {
         link.removeEventListener("click", handleClick);
       });
     };
-  }, []);
+  }, [navHeight]); // Re-run effect jika valor navHeight berubah
 
   return <>{children}</>;
 }

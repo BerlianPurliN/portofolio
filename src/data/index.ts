@@ -14,10 +14,13 @@ export interface Profile {
   tagline: string;
   location?: string;
   email: string;
-  socials: {
-    label: string;
-    href: string;
-  }[];
+}
+
+/** Social link untuk Contact section / footer. */
+export interface SocialLink {
+  label: string;
+  href: string;
+  handle: string;
 }
 
 /** Satu item pengalaman kerja / magang. */
@@ -43,15 +46,15 @@ export interface Skill {
 export interface Project {
   id: string;
   title: string;
-  subtitle: string;     // label singkat di atas judul, mis. "Mobile · ERP"
+  subtitle: string;
   description: string;
   techStack: string[];
-  // Path relatif terhadap /public — kosongkan kalau belum ada gambar.
+
   image?: string;
-  // Link demo / repo — opsional.
+
   demoUrl?: string;
   repoUrl?: string;
-  // Highlight singkat di card.
+
   featured?: boolean;
 }
 
@@ -62,13 +65,28 @@ export const profile: Profile = {
   role: "Web and Mobile Developer",
   tagline:
     "Software engineer with a passion for crafting seamless web and mobile experiences. Skilled in Laravel, Next.js, and Flutter, I thrive on turning complex problems into elegant solutions. Always eager to learn and collaborate on innovative projects.",
-  email: "harlemclaudesda@gmail.com",
-  socials: [
-    { label: "GitHub", href: "https://github.com/" },
-    { label: "LinkedIn", href: "https://linkedin.com/" },
-    { label: "Email", href: "mailto:harlemclaudesda@gmail.com" },
-  ],
+  email: "novtengpn14@gmail.com",
+  location: "🇮🇩 Indonesia, East Java, Surabaya",
 };
+
+/** Daftar sosial media — dipakai di ContactSection / footer. */
+export const socials: SocialLink[] = [
+  {
+    label: "GitHub",
+    href: "https://github.com/BerlianPurliN",
+    handle: "BerlianPurliNi",
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/berlianpurlin",
+    handle: "Berlian Purli Novarianto",
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/cllmenova/",
+    handle: "cllmenova",
+  },
+];
 
 export const experiences: Experience[] = [
   {
@@ -97,6 +115,9 @@ export const skills: Skill[] = [
   { name: "Figma", category: "Design", level: "Intermediate" },
 ];
 
+// URL LinkedIn projects — dipakai semua project mengarah ke sini
+const LINKEDIN_PROJECTS_URL = "https://www.linkedin.com/in/berlianpurlin/details/projects/";
+
 export const projects: Project[] = [
   {
     id: "teamgrid",
@@ -105,6 +126,8 @@ export const projects: Project[] = [
     description:
       "Aplikasi mini Enterprise Resource Planning (ERP) untuk manajemen SDM berbasis project. Mendukung penugasan tim, monitoring progres, dan kolaborasi real-time.",
     techStack: ["Flutter", "Firebase", "Cloud Firestore"],
+    image: "/dolfin-brain.png",
+    demoUrl: LINKEDIN_PROJECTS_URL,
     featured: true,
   },
   {
@@ -114,6 +137,8 @@ export const projects: Project[] = [
     description:
       "Aplikasi Learning Management System (LMS) mobile yang menyajikan materi belajar interaktif dengan pengalaman pengguna yang ringan dan fokus.",
     techStack: ["Flutter", "Dart"],
+    image: "/dolfin-brain.png",
+    demoUrl: LINKEDIN_PROJECTS_URL,
     featured: true,
   },
 ];
