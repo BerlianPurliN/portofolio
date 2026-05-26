@@ -15,7 +15,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Berlian Purli Novarianto",
   description:
-    "Portofolio website of Berlian Purli Novarianto, a software engineer.",
+    "Portfolio website of Berlian Purli Novarianto, a Web and Mobile Developer.",
+  icons: {
+    icon: "/T.ico",
+    shortcut: "/T.ico",
+    apple: "/T.ico",
+  },
 };
 
 export default function RootLayout({
