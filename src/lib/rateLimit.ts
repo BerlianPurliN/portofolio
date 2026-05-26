@@ -1,39 +1,41 @@
 // =============================================================================
 // src/lib/rateLimit.ts
 // -----------------------------------------------------------------------------
-// Client-side rate limiter berbasis localStorage. Mencegah satu user submit
-// form berkali-kali dalam waktu singkat (mitigasi spam/DDoS dari klien yang sama).
+// Client-side rate limiter backed by localStorage. Prevents a single user
+// from repeatedly submitting the form in a short window (mitigates spam/DDoS
+// from the same client).
 //
-// PENTING: Ini PROTEKSI KLIEN — bisa di-bypass attacker yang clear storage.
-// Untuk proteksi nyata, kombinasikan dengan:
-//   - Rate limit di EmailJS dashboard (Allowed Domains + Max requests/hour)
-//   - Cloudflare / Vercel WAF di production
-//   - reCAPTCHA / Turnstile untuk verifikasi human
+// IMPORTANT: this is CLIENT-SIDE protection — it can be bypassed by an
+// attacker who clears storage. For real protection, combine with:
+//   - Rate limiting in the EmailJS dashboard (Allowed Domains + max
+//     requests/hour)
+//   - Cloudflare / Vercel WAF in production
+//   - reCAPTCHA / Turnstile for human verification
 // =============================================================================
 
 const STORAGE_KEY = "contact_submissions";
 
 interface RateLimitConfig {
-  /** Maksimal submission dalam window waktu */
+  /** Maximum number of submissions within the window. */
   maxAttempts: number;
-  /** Window waktu dalam millisecond */
+  /** Window length in milliseconds. */
   windowMs: number;
 }
 
-// Default: 3 submission per jam, 10 per 24 jam
+// Defaults: 3 submissions per hour, 10 per 24 hours.
 const HOURLY_LIMIT: RateLimitConfig = {
   maxAttempts: 3,
-  windowMs: 60 * 60 * 1000, // 1 jam
+  windowMs: 60 * 60 * 1000, // 1 hour
 };
 
 const DAILY_LIMIT: RateLimitConfig = {
   maxAttempts: 10,
-  windowMs: 24 * 60 * 60 * 1000, // 24 jam
+  windowMs: 24 * 60 * 60 * 1000, // 24 hours
 };
 
 /**
- * Cek apakah user diizinkan submit form sekarang.
- * Return { allowed, reason, waitMs } — waitMs = berapa lama harus tunggu.
+ * Check whether the user is currently allowed to submit the form.
+ * Returns { allowed, reason, waitMs } — waitMs = how long to wait.
  */
 export function checkRateLimit(): {
   allowed: boolean;
@@ -47,37 +49,37 @@ export function checkRateLimit(): {
     const timestamps: number[] = raw ? JSON.parse(raw) : [];
     const now = Date.now();
 
-    // Bersihkan timestamp yang sudah expired (> 24 jam)
+    // Drop timestamps that have expired (> 24 hours).
     const recent = timestamps.filter((t) => now - t < DAILY_LIMIT.windowMs);
 
-    // Cek limit per jam
+    // Check the hourly limit.
     const lastHour = recent.filter((t) => now - t < HOURLY_LIMIT.windowMs);
     if (lastHour.length >= HOURLY_LIMIT.maxAttempts) {
       const oldest = Math.min(...lastHour);
       const waitMs = HOURLY_LIMIT.windowMs - (now - oldest);
       return {
         allowed: false,
-        reason: `Terlalu banyak pesan. Coba lagi dalam ${Math.ceil(waitMs / 60000)} menit.`,
+        reason: `Too many messages. Please try again in ${Math.ceil(waitMs / 60000)} minutes.`,
         waitMs,
       };
     }
 
-    // Cek limit per hari
+    // Check the daily limit.
     if (recent.length >= DAILY_LIMIT.maxAttempts) {
       return {
         allowed: false,
-        reason: "Batas harian tercapai. Coba lagi besok.",
+        reason: "Daily limit reached. Please try again tomorrow.",
       };
     }
 
     return { allowed: true };
   } catch {
-    // Kalau localStorage error (private mode, dll), biarkan submit
+    // If localStorage errors (private mode, etc.), allow the submission.
     return { allowed: true };
   }
 }
 
-/** Catat submission yang berhasil (panggil setelah send sukses). */
+/** Record a successful submission (call after the email is sent). */
 export function recordSubmission(): void {
   if (typeof window === "undefined") return;
 
@@ -85,10 +87,10 @@ export function recordSubmission(): void {
     const raw = localStorage.getItem(STORAGE_KEY);
     const timestamps: number[] = raw ? JSON.parse(raw) : [];
     timestamps.push(Date.now());
-    // Simpan max 50 timestamp untuk hemat space
+    // Keep at most 50 timestamps to save space.
     const trimmed = timestamps.slice(-50);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
   } catch {
-    // Silent fail — bukan masalah kritis
+    // Silent fail — not a critical issue.
   }
 }

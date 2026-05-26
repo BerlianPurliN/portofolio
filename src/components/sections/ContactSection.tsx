@@ -1,8 +1,8 @@
 // =============================================================================
 // src/components/sections/ContactSection.tsx
 // -----------------------------------------------------------------------------
-// Section "Contact" — formulir interaktif + info kontak.
-// Client component karena memakai useState untuk form & feedback animation.
+// "Contact" section — interactive form + contact info.
+// Client component because it uses useState for form & feedback animations.
 // =============================================================================
 
 "use client";
@@ -12,20 +12,21 @@ import emailjs from "@emailjs/browser";
 import { profile, socials } from "@/src/data";
 import { checkRateLimit, recordSubmission } from "@/src/lib/rateLimit";
 
-// Status pengiriman form — dipakai untuk menampilkan feedback visual.
+// Form submission status — drives visual feedback.
 type FormStatus = "idle" | "submitting" | "success" | "error";
 
-// ---------- KONSTANTA KEAMANAN ---------------------------------------------
-// Minimal waktu user mengisi form (ms). Bot biasanya submit < 1 detik.
+// ---------- SECURITY CONSTANTS ---------------------------------------------
+// Minimum time the user must spend filling the form (ms). Bots usually
+// submit in under one second.
 const MIN_FILL_TIME_MS = 3000;
-// Maksimal panjang input untuk mencegah payload abuse.
+// Maximum input lengths — guards against payload abuse.
 const MAX_NAME_LENGTH = 100;
 const MAX_EMAIL_LENGTH = 100;
 const MAX_MESSAGE_LENGTH = 2000;
-// Regex email — basic validation.
+// Email regex — basic validation.
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// EmailJS config — disimpan di .env.local, jangan hardcode.
+// EmailJS config — read from .env.local, never hardcode.
 const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "";
 const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "";
 const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "";
@@ -36,14 +37,14 @@ export default function ContactSection() {
     name: "",
     email: "",
     message: "",
-    // Honeypot field — jangan dihapus, ini perangkap bot.
+    // Honeypot field — do not remove, this is the bot trap.
     website: "",
   });
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [copied, setCopied] = useState(false);
 
-  // Timestamp ketika component mount — untuk cek minimum fill time.
+  // Timestamp of when the component mounted — used for the minimum fill check.
   const mountTimeRef = useRef<number>(0);
   useEffect(() => {
     mountTimeRef.current = Date.now();
@@ -51,13 +52,13 @@ export default function ContactSection() {
 
   // ---------- Validators ----------------------------------------------------
   function validateForm(): string | null {
-    if (!form.name.trim()) return "Nama wajib diisi.";
-    if (form.name.length > MAX_NAME_LENGTH) return "Nama terlalu panjang.";
-    if (!EMAIL_REGEX.test(form.email)) return "Format email tidak valid.";
-    if (form.email.length > MAX_EMAIL_LENGTH) return "Email terlalu panjang.";
-    if (!form.message.trim()) return "Pesan wajib diisi.";
+    if (!form.name.trim()) return "Name is required.";
+    if (form.name.length > MAX_NAME_LENGTH) return "Name is too long.";
+    if (!EMAIL_REGEX.test(form.email)) return "Invalid email format.";
+    if (form.email.length > MAX_EMAIL_LENGTH) return "Email is too long.";
+    if (!form.message.trim()) return "Message is required.";
     if (form.message.length > MAX_MESSAGE_LENGTH)
-      return `Pesan maksimal ${MAX_MESSAGE_LENGTH} karakter.`;
+      return `Message must be ${MAX_MESSAGE_LENGTH} characters or fewer.`;
     return null;
   }
 
@@ -66,20 +67,20 @@ export default function ContactSection() {
     e.preventDefault();
     setErrorMsg("");
 
-    // [LAYER 1] Honeypot check — jika bot isi field "website", silent reject.
+    // [LAYER 1] Honeypot check — if a bot fills the "website" field, silently reject.
     if (form.website) {
-      // Pura-pura sukses agar bot tidak retry. Tidak kirim email.
+      // Pretend success so the bot won't retry. No email is sent.
       setStatus("success");
       setForm({ name: "", email: "", message: "", website: "" });
       setTimeout(() => setStatus("idle"), 4000);
       return;
     }
 
-    // [LAYER 2] Time-based check — form harus diisi >= MIN_FILL_TIME_MS.
+    // [LAYER 2] Time-based check — the form must be open for at least MIN_FILL_TIME_MS.
     const fillTime = Date.now() - mountTimeRef.current;
     if (fillTime < MIN_FILL_TIME_MS) {
       setStatus("error");
-      setErrorMsg("Submission terlalu cepat. Coba lagi.");
+      setErrorMsg("Submission was too fast. Please try again.");
       return;
     }
 
@@ -95,7 +96,7 @@ export default function ContactSection() {
     const rateCheck = checkRateLimit();
     if (!rateCheck.allowed) {
       setStatus("error");
-      setErrorMsg(rateCheck.reason || "Terlalu banyak request.");
+      setErrorMsg(rateCheck.reason || "Too many requests.");
       return;
     }
 
@@ -103,15 +104,15 @@ export default function ContactSection() {
     if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
       setStatus("error");
       setErrorMsg(
-        "EmailJS belum dikonfigurasi. Cek file .env.local Anda.",
+        "EmailJS is not configured. Please check your .env.local file.",
       );
       return;
     }
 
-    // ---------- Kirim email via EmailJS ----------
+    // ---------- Send the email via EmailJS ----------
     setStatus("submitting");
     try {
-      // Log untuk debugging
+      // Log for debugging
       console.log("EmailJS config check:");
       console.log("- Service ID:", EMAILJS_SERVICE_ID ? "✓ Set" : "✗ MISSING");
       console.log("- Template ID:", EMAILJS_TEMPLATE_ID ? "✓ Set" : "✗ MISSING");
@@ -121,7 +122,8 @@ export default function ContactSection() {
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
         {
-          // Variable ini harus SAMA dengan placeholder di EmailJS template (case-sensitive)
+          // These variables must EXACTLY match the placeholders in the
+          // EmailJS template (case-sensitive).
           from_name: form.name.trim(),
           from_email: form.email.trim(),
           message: form.message.trim(),
@@ -131,12 +133,12 @@ export default function ContactSection() {
       );
 
       console.log("✓ Email sent successfully:", result);
-      recordSubmission(); // Catat untuk rate limit
+      recordSubmission(); // Record for the rate limiter
       setStatus("success");
       setForm({ name: "", email: "", message: "", website: "" });
       setTimeout(() => setStatus("idle"), 4000);
     } catch (err) {
-      // Log error detail untuk debugging
+      // Log error detail for debugging
       const errorMsg =
         err instanceof Error
           ? err.message
@@ -146,26 +148,30 @@ export default function ContactSection() {
       console.error("❌ EmailJS error detail:", errorMsg);
       console.error("Full error object:", err);
 
-      // Tampilkan user-friendly error message
+      // Show a user-friendly error message
       setStatus("error");
       if (
         errorMsg.includes("Allowed Domains") ||
         errorMsg.includes("origin")
       ) {
         setErrorMsg(
-          "Domain tidak authorized. Set 'Allowed Domains' di EmailJS dashboard.",
+          "Domain not authorized. Please set 'Allowed Domains' in the EmailJS dashboard.",
         );
       } else if (errorMsg.includes("MISSING")) {
-        setErrorMsg("Config tidak lengkap. Cek .env.local Anda.");
+        setErrorMsg(
+          "Configuration incomplete. Please check your .env.local file.",
+        );
       } else if (errorMsg.includes("Template")) {
-        setErrorMsg("Template variable salah. Periksa di EmailJS.");
+        setErrorMsg(
+          "Template variable mismatch. Please verify your EmailJS template.",
+        );
       } else {
         setErrorMsg(`Error: ${errorMsg.substring(0, 100)}`);
       }
     }
   };
 
-  // Copy email ke clipboard — beri feedback "Copied!" 2 detik.
+  // Copy email to clipboard — show "Copied!" feedback for 2 seconds.
   const copyEmail = async () => {
     await navigator.clipboard.writeText(profile.email);
     setCopied(true);
@@ -178,14 +184,14 @@ export default function ContactSection() {
       id="contact"
       className="relative w-full overflow-hidden bg-neutral-950 py-24 text-neutral-100 sm:py-32"
     >
-      {/* ----- Background dekoratif (glow lembut) ---------------------------- */}
+      {/* ----- Decorative background (soft glow) ---------------------------- */}
       <div
         aria-hidden
-        className="pointer-events-none absolute top-1/2 left-1/2 h-105 w-105 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/10 blur-3xl"
+        className="pointer-events-none absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/10 blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-0 right-0 h-75 w-75 rounded-full bg-fuchsia-500/10 blur-3xl"
+        className="pointer-events-none absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-fuchsia-500/10 blur-3xl"
       />
 
       <div className="relative mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-16">
@@ -196,22 +202,23 @@ export default function ContactSection() {
           </p>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
             Let&apos;s build something{" "}
-            <span className="bg-linear-to-r from-indigo-300 via-sky-300 to-fuchsia-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-indigo-300 via-sky-300 to-fuchsia-300 bg-clip-text text-transparent">
               amazing
             </span>{" "}
             together
           </h2>
           <p className="max-w-xl text-neutral-400">
-            Punya ide project, kolaborasi, atau sekadar ingin ngobrol soal tech?
-            Drop pesan di bawah — biasanya saya balas dalam 1×24 jam.
+            Have a project idea, a collaboration in mind, or simply want to
+            chat about tech? Drop a message below — I usually reply within
+            24 hours.
           </p>
         </div>
 
         {/* ----- Grid layout: Info + Form --------------------------------- */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-          {/* =========== Info panel (kiri) =============================== */}
+          {/* =========== Info panel (left) =============================== */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-            {/* Card email — clickable untuk copy */}
+            {/* Email card — clickable to copy */}
             <button
               type="button"
               onClick={copyEmail}
@@ -222,7 +229,7 @@ export default function ContactSection() {
               </span>
               <span className="flex items-center gap-2 text-base font-medium text-neutral-100 sm:text-lg">
                 {profile.email}
-                {/* Indikator copy */}
+                {/* Copy indicator */}
                 <span
                   className={`ml-2 text-xs font-normal transition ${
                     copied
@@ -235,7 +242,7 @@ export default function ContactSection() {
               </span>
             </button>
 
-            {/* Card lokasi */}
+            {/* Location card */}
             {profile.location && (
               <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 backdrop-blur">
                 <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">
@@ -251,7 +258,7 @@ export default function ContactSection() {
               </div>
             )}
 
-            {/* Card socials */}
+            {/* Socials card */}
             <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 backdrop-blur">
               <p className="mb-4 text-xs uppercase tracking-[0.18em] text-neutral-500">
                 Find me on
@@ -282,17 +289,17 @@ export default function ContactSection() {
             </div>
           </div>
 
-          {/* =========== Form panel (kanan) ============================== */}
+          {/* =========== Form panel (right) ============================== */}
           <form
             onSubmit={handleSubmit}
             className="lg:col-span-3 rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 backdrop-blur sm:p-8"
           >
             <div className="flex flex-col gap-5">
               {/* =========== HONEYPOT FIELD ============================== */}
-              {/* Field tersembunyi untuk perangkap bot. Manusia tidak melihat
-                  field ini, tapi bot akan auto-fill semua field. Jika field
-                  ini terisi → form di-reject diam-diam.
-                  PENTING: jangan ganti name="website" atau hapus tabIndex. */}
+              {/* Hidden field to trap bots. Humans don't see this field, but
+                  bots will auto-fill every field. If this field is filled,
+                  the form is silently rejected.
+                  IMPORTANT: do not change name="website" or remove tabIndex. */}
               <div
                 aria-hidden
                 style={{
@@ -348,7 +355,7 @@ export default function ContactSection() {
                   className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-neutral-500"
                 >
                   <span>Message</span>
-                  {/* Counter karakter — feedback ke user */}
+                  {/* Character counter — feedback for the user */}
                   <span className="normal-case tracking-normal">
                     {form.message.length}/{MAX_MESSAGE_LENGTH}
                   </span>
@@ -362,19 +369,19 @@ export default function ContactSection() {
                   onChange={(e) =>
                     setForm({ ...form, message: e.target.value })
                   }
-                  placeholder="Halo Berlian, saya ingin diskusi tentang…"
+                  placeholder="Hi Berlian, I'd love to discuss…"
                   className="resize-none rounded-lg border border-neutral-800 bg-neutral-950/60 px-4 py-3 text-sm text-neutral-100 placeholder:text-neutral-600 transition focus:border-neutral-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 />
               </div>
 
-              {/* Error message — tampil saat status error */}
+              {/* Error message — shown when status is error */}
               {status === "error" && errorMsg && (
                 <div className="rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">
                   ⚠ {errorMsg}
                 </div>
               )}
 
-              {/* Submit button — text & icon berubah sesuai status */}
+              {/* Submit button — text & icon change based on status */}
               <button
                 type="submit"
                 disabled={status === "submitting" || status === "success"}
@@ -400,9 +407,9 @@ export default function ContactSection() {
                 )}
               </button>
 
-              {/* Helper text di bawah submit button */}
+              {/* Helper text below the submit button */}
               <p className="text-center text-xs text-neutral-500">
-                Atau kirim email langsung ke{" "}
+                Or email me directly at{" "}
                 <a
                   href={`mailto:${profile.email}`}
                   className="text-neutral-300 underline-offset-4 hover:underline"
@@ -419,10 +426,10 @@ export default function ContactSection() {
 }
 
 // ---------------------------------------------------------------------------
-// Subcomponents — disimpan di file ini agar mudah dipindah ke ui/ kalau perlu.
+// Subcomponents — kept in this file; move to ui/ if reused elsewhere.
 // ---------------------------------------------------------------------------
 
-/** Field input reusable dengan label & styling konsisten. */
+/** Reusable input field with consistent label & styling. */
 function FormField({
   label,
   id,
@@ -465,7 +472,7 @@ function FormField({
   );
 }
 
-/** Spinner kecil — dipakai di button saat status submitting. */
+/** Small spinner — used in the button when status is submitting. */
 function Spinner() {
   return (
     <span

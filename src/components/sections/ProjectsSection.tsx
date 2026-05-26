@@ -17,23 +17,33 @@ export default function ProjectsSection() {
             Featured Projects
           </h2>
           <p className="max-w-2xl text-neutral-400">
-            Beberapa project yang saya bangun untuk mengeksplorasi domain web,
-            mobile, dan kolaborasi tim berbasis data real-time.
+            A selection of projects I&apos;ve built while exploring the web,
+            mobile, and real-time team collaboration spaces.
           </p>
         </div>
 
         {/* ----- Grid ---------------------------------------------------- */}
-        {/* 1 kolom di mobile, 2 kolom di md+. Ubah ke lg:grid-cols-3
-            jika project sudah lebih dari 2. */}
+        {/* 1 column on mobile, 2 on md+. Bump to lg:grid-cols-3
+            once there are more than two projects. */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3">
           {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <a
+            href="https://www.linkedin.com/in/berlianpurlin/details/projects/"
+            target="_blank"
+            className="inline-block rounded-full bg-black px-5 py-2 text-sm font-medium text-white border border-white hover:bg-neutral-800 text-center"
+          >
+            View More →
+          </a>
         </div>
       </div>
     </section>
   );
 }
 
-// ProjectCard sudah dipindahkan ke src/components/ui/ProjectCard.tsx
-// agar bisa handle click events dengan aman sebagai Client Component.
+// ProjectCard has been moved to src/components/ui/ProjectCard.tsx so it can
+// safely handle click events as a Client Component.

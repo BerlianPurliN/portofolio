@@ -1,8 +1,8 @@
 // =============================================================================
 // src/components/ui/ProjectCard.tsx
 // -----------------------------------------------------------------------------
-// ProjectCard — Client Component agar bisa handle click events dengan aman.
-// Ini dipindahkan dari ProjectsSection agar tidak conflict dengan Server Component.
+// ProjectCard — a Client Component so it can safely handle click events.
+// Extracted from ProjectsSection to avoid conflicts with the Server Component.
 // =============================================================================
 
 "use client";
@@ -10,10 +10,10 @@
 import type { Project } from "@/src/data";
 
 export function ProjectCard({ project }: { project: Project }) {
-  // Tentukan URL untuk card link — prioritas: demoUrl > repoUrl
+  // Decide the card link URL — priority: demoUrl > repoUrl
   const cardUrl = project.demoUrl || project.repoUrl;
 
-  // Wrapper element — <a> jika ada URL, <div> jika tidak
+  // Wrapper element — <a> if a URL exists, otherwise <div>
   const WrapperComponent = cardUrl ? "a" : "div";
   const wrapperProps = cardUrl
     ? {
@@ -26,11 +26,11 @@ export function ProjectCard({ project }: { project: Project }) {
   return (
     <WrapperComponent
       {...wrapperProps}
-      // group: dipakai untuk hover effect pada anak elemen.
-      // relative + overflow-hidden: menampung border highlight & gambar.
+      // group: drives hover effects on child elements.
+      // relative + overflow-hidden: contains the border highlight & image.
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 backdrop-blur transition hover:border-neutral-700 hover:bg-neutral-900/70"
     >
-      {/* Subtle gradient border highlight saat hover */}
+      {/* Subtle gradient border highlight on hover */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition group-hover:opacity-100"
@@ -41,7 +41,7 @@ export function ProjectCard({ project }: { project: Project }) {
       />
 
       {/* ----- Media / preview -------------------------------------------- */}
-      {/* Gunakan project.image jika tersedia, fallback ke placeholder letter. */}
+      {/* Use project.image when available; fall back to a placeholder letter. */}
       <div className="mb-6 aspect-[16/10] w-full overflow-hidden rounded-xl border border-neutral-800 bg-gradient-to-br from-neutral-800/60 via-neutral-900 to-black">
         {project.image ? (
           <img
@@ -84,23 +84,21 @@ export function ProjectCard({ project }: { project: Project }) {
       </ul>
 
       {/* ----- Actions ------------------------------------------------------ */}
-      {/* Inner action diubah dari <a> ke <button> agar tidak nested <a> dalam
-          <a> (invalid HTML). Pakai window.open() + stopPropagation supaya
-          click di button TIDAK trigger card link. */}
+      {/* Inner actions are <button> instead of <a> to avoid nested <a> tags
+          (invalid HTML). We use window.open() + stopPropagation so a click on
+          the button does NOT trigger the parent card link. */}
       {(project.demoUrl || project.repoUrl) && (
         <div className="mt-6 flex flex-wrap gap-4 text-sm">
           {project.demoUrl && (
             <button
               type="button"
               onClick={(e) => {
-                e.stopPropagation(); // Cegah click bubble ke card wrapper
-                e.preventDefault();  // Cegah default anchor navigation
+                e.stopPropagation(); // Prevent click bubbling to card wrapper
+                e.preventDefault(); // Prevent default anchor navigation
                 window.open(project.demoUrl, "_blank", "noopener,noreferrer");
               }}
               className="font-medium text-neutral-100 underline-offset-4 hover:underline"
-            >
-              Live demo ↗
-            </button>
+            ></button>
           )}
           {project.repoUrl && (
             <button
@@ -111,9 +109,7 @@ export function ProjectCard({ project }: { project: Project }) {
                 window.open(project.repoUrl, "_blank", "noopener,noreferrer");
               }}
               className="font-medium text-neutral-400 underline-offset-4 hover:text-neutral-100 hover:underline"
-            >
-              Source code ↗
-            </button>
+            ></button>
           )}
         </div>
       )}

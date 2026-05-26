@@ -1,8 +1,9 @@
 // =============================================================================
 // src/hooks/useSmoothScroll.ts
 // -----------------------------------------------------------------------------
-// Hook untuk smooth scroll animation menggunakan GSAP.
-// Memberikan efek scroll yang lebih smooth dan elegant saat user klik anchor.
+// Hook for smooth-scroll animation using GSAP.
+// Produces a smoother, more elegant scroll effect when the user clicks
+// an anchor link.
 // =============================================================================
 
 import { useEffect } from "react";
@@ -10,27 +11,28 @@ import { gsap } from "gsap";
 
 export function useSmoothScroll() {
   useEffect(() => {
-    // Tangkap semua anchor links (href dimulai dengan #)
+    // Capture every anchor link (href starting with #).
     const links = document.querySelectorAll('a[href^="#"]');
 
     const handleClick = (e: Event) => {
       const link = e.currentTarget as HTMLAnchorElement;
       const href = link.getAttribute("href");
 
-      // Skip jika href hanya "#"
+      // Skip if href is just "#".
       if (!href || href === "#") return;
 
-      const targetId = href.substring(1); // Hapus # dari href
+      const targetId = href.substring(1); // Strip "#" from href
       const targetElement = document.getElementById(targetId);
 
-      // Jika target ditemukan, lakukan smooth scroll dengan GSAP
+      // If the target is found, run the smooth scroll with GSAP.
       if (targetElement) {
         e.preventDefault();
 
-        // Dapatkan posisi scroll target
-        const targetScrollY = targetElement.getBoundingClientRect().top + window.scrollY;
+        // Get the target scroll position.
+        const targetScrollY =
+          targetElement.getBoundingClientRect().top + window.scrollY;
 
-        // Animate scroll dengan GSAP
+        // Animate the scroll with GSAP.
         gsap.to(window, {
           scrollTo: {
             y: targetScrollY,
@@ -42,7 +44,7 @@ export function useSmoothScroll() {
       }
     };
 
-    // Tambahkan event listener ke semua anchor links
+    // Add the event listener to every anchor link.
     links.forEach((link) => {
       link.addEventListener("click", handleClick);
     });

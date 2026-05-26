@@ -1,13 +1,13 @@
 // =============================================================================
 // src/data/index.ts
 // -----------------------------------------------------------------------------
-// Pusat data statis untuk seluruh halaman portofolio.
-// Edit nilai di sini tanpa perlu menyentuh komponen UI-nya.
+// Centralized static data for the entire portfolio site.
+// Edit values here without touching the UI components.
 // =============================================================================
 
 // ---------- TypeScript Interfaces -------------------------------------------
 
-/** Identitas singkat yang dipakai di HeroSection & metadata. */
+/** Short identity used in HeroSection & metadata. */
 export interface Profile {
   name: string;
   role: string;
@@ -16,33 +16,33 @@ export interface Profile {
   email: string;
 }
 
-/** Social link untuk Contact section / footer. */
+/** Social link used in the Contact section / footer. */
 export interface SocialLink {
   label: string;
   href: string;
   handle: string;
 }
 
-/** Satu item pengalaman kerja / magang. */
+/** A single work / internship experience entry. */
 export interface Experience {
   id: string;
   company: string;
   position: string;
   type: "Internship" | "Full-time" | "Part-time" | "Freelance";
-  startDate: string; // contoh: "2024-08"
+  startDate: string; // example: "2024-08"
   endDate: string | "Present";
   description: string;
   highlights: string[];
 }
 
-/** Skill / tech stack — dikelompokkan agar mudah ditampilkan per kategori. */
+/** Skill / tech stack — grouped for easy per-category display. */
 export interface Skill {
   name: string;
   category: "Language" | "Framework" | "Mobile" | "Backend" | "Design" | "Tool";
   level?: "Beginner" | "Intermediate" | "Advanced";
 }
 
-/** Project unggulan yang ditampilkan di ProjectsSection. */
+/** Featured project displayed in ProjectsSection. */
 export interface Project {
   id: string;
   title: string;
@@ -66,10 +66,10 @@ export const profile: Profile = {
   tagline:
     "Software engineer with a passion for crafting seamless web and mobile experiences. Skilled in Laravel, Next.js, and Flutter, I thrive on turning complex problems into elegant solutions. Always eager to learn and collaborate on innovative projects.",
   email: "novtengpn14@gmail.com",
-  location: "🇮🇩 Indonesia, East Java, Surabaya",
+  location: "Surabaya, East Java, Indonesia 🇮🇩",
 };
 
-/** Daftar sosial media — dipakai di ContactSection / footer. */
+/** Social media list — used in ContactSection / footer. */
 export const socials: SocialLink[] = [
   {
     label: "GitHub",
@@ -97,11 +97,11 @@ export const experiences: Experience[] = [
     startDate: "2024-08",
     endDate: "Present",
     description:
-      "Berkontribusi membangun fitur untuk produk web dan mobile internal klien.",
+      "Contributing to the development of features for internal web and mobile products serving client needs.",
     highlights: [
-      "Mengembangkan modul web menggunakan Laravel & Next.js.",
-      "Membangun aplikasi mobile cross-platform dengan Flutter.",
-      "Berkolaborasi dalam alur Git dan code review tim.",
+      "Developed web modules using Laravel & Next.js.",
+      "Built cross-platform mobile applications with Flutter.",
+      "Collaborated within team Git workflows and code review cycles.",
     ],
   },
 ];
@@ -115,8 +115,9 @@ export const skills: Skill[] = [
   { name: "Figma", category: "Design", level: "Intermediate" },
 ];
 
-// URL LinkedIn projects — dipakai semua project mengarah ke sini
-const LINKEDIN_PROJECTS_URL = "https://www.linkedin.com/in/berlianpurlin/details/projects/";
+// LinkedIn projects URL — all projects point here.
+const LINKEDIN_PROJECTS_URL =
+  "https://www.linkedin.com/in/berlianpurlin/details/projects/";
 
 export const projects: Project[] = [
   {
@@ -124,9 +125,9 @@ export const projects: Project[] = [
     title: "TeamGrid",
     subtitle: "Mobile · Mini ERP",
     description:
-      "Aplikasi mini Enterprise Resource Planning (ERP) untuk manajemen SDM berbasis project. Mendukung penugasan tim, monitoring progres, dan kolaborasi real-time.",
-    techStack: ["Flutter", "Firebase", "Cloud Firestore"],
-    image: "/dolfin-brain.png",
+      "A lightweight Enterprise Resource Planning (ERP) application for project-based human resource management. Supports team assignments, progress tracking, and real-time collaboration.",
+    techStack: ["Flutter", "Firebase"],
+    image: "/teamgrid.png",
     demoUrl: LINKEDIN_PROJECTS_URL,
     featured: true,
   },
@@ -135,9 +136,20 @@ export const projects: Project[] = [
     title: "Dolfin Brain",
     subtitle: "Mobile · LMS",
     description:
-      "Aplikasi Learning Management System (LMS) mobile yang menyajikan materi belajar interaktif dengan pengalaman pengguna yang ringan dan fokus.",
-    techStack: ["Flutter", "Dart"],
+      "A mobile Learning Management System (LMS) that delivers interactive learning materials with a lightweight, focused user experience.",
+    techStack: ["Flutter", "Laravel"],
     image: "/dolfin-brain.png",
+    demoUrl: LINKEDIN_PROJECTS_URL,
+    featured: true,
+  },
+  {
+    id: "bentala",
+    title: "Bentala",
+    subtitle: "Web · Company Profile",
+    description:
+      "The official platform of Bentala — an advisory and capacity-building organization focused on climate solutions and ESG (Environmental, Social, and Governance) practices in Indonesia.",
+    techStack: ["WordPress"],
+    image: "/bentala.png",
     demoUrl: LINKEDIN_PROJECTS_URL,
     featured: true,
   },

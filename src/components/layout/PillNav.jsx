@@ -1,12 +1,12 @@
 "use client";
 
 // =============================================================================
-// PillNav (React Bits) — versi tanpa logo, dipakai di Next.js App Router.
+// PillNav (React Bits) — logoless version, adapted for the Next.js App Router.
 // -----------------------------------------------------------------------------
-// Perubahan dari versi original:
-//   1. Tambah "use client" karena memakai GSAP & useEffect/useState.
-//   2. Ganti `react-router-dom` -> `next/link` untuk routing Next.js.
-//   3. Hapus seluruh blok logo (logoRef, handleLogoEnter, animasi logo).
+// Changes from the original:
+//   1. Added "use client" because it uses GSAP & useEffect/useState.
+//   2. Replaced `react-router-dom` with `next/link` for Next.js routing.
+//   3. Removed the entire logo block (logoRef, handleLogoEnter, logo animation).
 // =============================================================================
 
 import { useEffect, useRef, useState } from "react";
@@ -28,7 +28,7 @@ const PillNav = ({
 }) => {
   const resolvedPillTextColor = pillTextColor ?? baseColor;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // State untuk tracking section aktif berdasarkan scroll position
+  // State for tracking the active section based on scroll position.
   const [activeHref, setActiveHref] = useState(propActiveHref);
   const circleRefs = useRef([]);
   const tlRefs = useRef([]);
@@ -114,7 +114,7 @@ const PillNav = ({
       gsap.set(menu, { visibility: "hidden", opacity: 0, scaleY: 1 });
     }
 
-    // Animasi masuk untuk nav items saja (logo sudah dihapus).
+    // Entrance animation for nav items only (logo has been removed).
     if (initialLoadAnimation) {
       const navItems = navItemsRef.current;
       if (navItems) {
@@ -130,10 +130,10 @@ const PillNav = ({
     return () => window.removeEventListener("resize", onResize);
   }, [items, ease, initialLoadAnimation]);
 
-  // Intersection Observer — deteksi section mana yang sedang di-view
-  // sehingga class is-active muncul pada menu item yang sesuai.
+  // Intersection Observer — detects which section is currently in view
+  // so the is-active class appears on the matching menu item.
   useEffect(() => {
-    // Ambil semua anchor links dari items (yang dimulai dengan #)
+    // Collect every anchor link from items (those starting with #).
     const anchors = items
       .map((item) => item.href)
       .filter((href) => href.startsWith("#"));
@@ -149,7 +149,7 @@ const PillNav = ({
           activeSection = `#${entry.target.id}`;
         }
       });
-      // Update active href berdasarkan section terakhir yang terlihat
+      // Update activeHref based on the most recently visible section.
       if (activeSection) {
         setActiveHref(activeSection);
       }
@@ -157,12 +157,12 @@ const PillNav = ({
 
     const observerOptions = {
       root: null,
-      rootMargin: "-50% 0px -50% 0px", // Trigger saat section di tengah viewport
+      rootMargin: "-50% 0px -50% 0px", // Fire when the section is centered in the viewport
       threshold: 0,
     };
 
     anchors.forEach((anchor) => {
-      const sectionId = anchor.substring(1); // Hapus # dari href
+      const sectionId = anchor.substring(1); // Strip the # from href
       const element = document.getElementById(sectionId);
       if (element) {
         const observer = new IntersectionObserver(callback, observerOptions);
@@ -249,7 +249,7 @@ const PillNav = ({
     onMobileMenuClick?.();
   };
 
-  // Link eksternal / anchor (#) tetap pakai <a>, internal pakai next/link.
+  // External / anchor (#) links use <a>; internal routes use next/link.
   const isExternalLink = (href) =>
     href.startsWith("http://") ||
     href.startsWith("https://") ||
@@ -274,7 +274,7 @@ const PillNav = ({
         aria-label="Primary"
         style={cssVars}
       >
-        {/* Logo dihapus — nav langsung dimulai dari daftar pill items. */}
+        {/* Logo removed — nav begins directly with the pill items list. */}
 
         <div className="pill-nav-items desktop-only" ref={navItemsRef}>
           <ul className="pill-list" role="menubar">
